@@ -12,14 +12,14 @@
   "title": "Relay Devtools",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/th3rdwave/flipper-plugin-redux-devtools.git"
+    "url": "git+https://github.com/th3rdwave/flipper-plugin-relay-devtools.git"
   },
   "author": "Janic Duplessis",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/th3rdwave/flipper-plugin-redux-devtools/issues"
+    "url": "https://github.com/th3rdwave/flipper-plugin-relay-devtools/issues"
   },
-  "homepage": "https://github.com/th3rdwave/flipper-plugin-redux-devtools#readme",
+  "homepage": "https://github.com/th3rdwave/flipper-plugin-relay-devtools#readme",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
