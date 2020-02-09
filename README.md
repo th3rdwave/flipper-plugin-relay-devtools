@@ -89,4 +89,8 @@ In AppDelegate.m
 [client addPlugin: [RelayDevtoolsFlipperPlugin new]];
 ```
 
+## Troubleshooting
 
+### Android
+
+You might need to run `adb reverse tcp:8098 tcp:8098`
