@@ -1,0 +1,49 @@
+{
+  "name": "flipper-plugin-relay-devtools",
+  "version": "0.1.0",
+  "description": "Flipper plugin for Relay devtools",
+  "main": "index.tsx",
+  "keywords": [
+    "flipper-plugin",
+    "relay",
+    "devtools"
+  ],
+  "icon": "network",
+  "title": "Relay Devtools",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/th3rdwave/flipper-plugin-redux-devtools.git"
+  },
+  "author": "Janic Duplessis",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/th3rdwave/flipper-plugin-redux-devtools/issues"
+  },
+  "homepage": "https://github.com/th3rdwave/flipper-plugin-redux-devtools#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "flipper": "latest",
+    "get-port": "^5.1.1",
+    "address": "^1.1.2",
+    "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.0.0-gitpkg"
+  },
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "react-dom": "*",
+    "react-native-flipper": "*"
+  },
+  "devDependencies": {
+    "@types/react": "^16.9.19",
+    "@types/react-dom": "^16.9.5",
+    "@types/react-native": "^0.61.12",
+    "react": "^16.12.0",
+    "react-native": "^0.61.5",
+    "react-dom": "^16.12.0",
+    "react-native-flipper": "^0.0.1",
+    "prettier": "^1.19.1",
+    "typescript": "^3.7.5"
+  }
+}
