@@ -2,6 +2,8 @@
 
 Flipper plugin wrapper for [relay-devtools](https://github.com/relayjs/relay-devtools).
 
+![](https://i.imgur.com/BlLx5af.png)
+
 Note that this uses the new version of relay devtools that is still under development and incomplete.
 
 ## Installation
