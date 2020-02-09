@@ -1,4 +1,4 @@
-# Flipper plugin for Relay DevTools
+# Flipper plugin for Relay devtools
 
 Flipper plugin wrapper for [relay-devtools](https://github.com/relayjs/relay-devtools).
 
