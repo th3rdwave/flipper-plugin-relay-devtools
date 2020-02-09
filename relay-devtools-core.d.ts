@@ -8,5 +8,12 @@ declare module 'relay-devtools-core/standalone' {
 }
 
 declare module 'relay-devtools-core/backend' {
-  export function connectToDevTools(options?: { port?: number });
+  interface ConnectOptions {
+    host?: string;
+    port?: number;
+    isAppActive?: () => boolean;
+    websocket?: typeof WebSocket;
+  }
+
+  export function connectToDevTools(options?: ConnectOptions);
 }
