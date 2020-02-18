@@ -28,67 +28,6 @@ if (__DEV__) {
 }
 ```
 
-### iOS
-
-Currently [react-native-flipper](https://github.com/facebook/flipper/tree/master/react-native/react-native-flipper) is only implemented on Android so iOS requires manual registration of the plugin.
-
-Create RelayDevtoolsFlipperPlugin.h
-
-```objc
-#if FB_SONARKIT_ENABLED
-
-#import <Foundation/Foundation.h>
-
-#import <FlipperKit/FlipperPlugin.h>
-
-@interface RelayDevtoolsFlipperPlugin : NSObject<FlipperPlugin>
-
-@end
-
-#endif
-```
-
-Create RelayDevtoolsFlipperPlugin.m
-
-```objc
-#if FB_SONARKIT_ENABLED
-
-#import "RelayDevtoolsFlipperPlugin.h"
-
-#import <FlipperKit/FlipperConnection.h>
-
-@implementation RelayDevtoolsFlipperPlugin
-
-- (NSString*)identifier
-{
-  return @"flipper-plugin-relay-devtools";
-}
-
-- (void)didConnect:(__unused id<FlipperConnection>)connection
-{
-}
-
-- (void)didDisconnect
-{
-}
-
-@end
-
-#endif
-```
-
-In AppDelegate.m
-
-```objc
-// With the other flipper imports
-#import "RelayDevtoolsFlipperPlugin.h"
-
-...
-
-// With the other flipper plugins
-[client addPlugin: [RelayDevtoolsFlipperPlugin new]];
-```
-
 ## Troubleshooting
 
 ### Android
