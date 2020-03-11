@@ -1,15 +1,24 @@
-import ReactDOM from 'react-dom';
 import RelayDevToolsStandalone from 'relay-devtools-core/standalone';
-import { FlipperPlugin, AndroidDevice, styled } from 'flipper';
-import React from 'react';
+import {
+  FlipperDevicePlugin,
+  AndroidDevice,
+  styled,
+  View,
+  Toolbar,
+  MetroDevice,
+  ReduxState,
+  connect,
+  Device,
+} from 'flipper';
+import React, { useEffect } from 'react';
 import getPort from 'get-port';
-import address from 'address';
 
 const Container = styled.div({
   display: 'flex',
   flex: '1 1 0%',
   justifyContent: 'center',
   alignItems: 'stretch',
+  height: '100%',
 });
 
 const DEV_TOOLS_NODE_ID = 'relaydevtools-out-of-react-node';
@@ -34,7 +43,7 @@ function findDevToolsNode(): HTMLElement | null {
 }
 
 function attachDevTools(target: Element | Text, devToolsNode: HTMLElement) {
-  target.insertBefore(devToolsNode, target.childNodes[0]);
+  target.appendChild(devToolsNode);
   devToolsNode.style.display = 'flex';
 }
 
@@ -43,44 +52,160 @@ function detachDevTools(devToolsNode: HTMLElement) {
   document.body && document.body.appendChild(devToolsNode);
 }
 
-export default class extends FlipperPlugin<{}, any, {}> {
+const CONNECTED = 'DevTools connected';
+
+type GrabMetroDeviceStoreProps = { metroDevice: MetroDevice };
+type GrabMetroDeviceOwnProps = { onHasDevice(device: MetroDevice): void };
+
+// Utility component to grab the metroDevice from the store if there is one
+const GrabMetroDevice = connect<
+  GrabMetroDeviceStoreProps,
+  {},
+  GrabMetroDeviceOwnProps,
+  ReduxState
+>(({ connections: { devices } }: ReduxState) => ({
+  metroDevice: devices.find(
+    device => device.os === 'Metro' && !device.isArchived,
+  ) as MetroDevice,
+}))(function({
+  metroDevice,
+  onHasDevice,
+}: GrabMetroDeviceStoreProps & GrabMetroDeviceOwnProps) {
+  useEffect(() => {
+    onHasDevice(metroDevice);
+  }, [metroDevice]);
+  return null;
+});
+
+const SUPPORTED_OCULUS_DEVICE_TYPES = ['quest', 'go', 'pacific'];
+
+export default class ReactDevTools extends FlipperDevicePlugin<
+  {
+    status: string;
+  },
+  any,
+  {}
+> {
+  static supportsDevice(device: Device) {
+    return !device.isArchived && device.os === 'Metro';
+  }
+
+  pollHandle?: any;
+  containerRef: React.RefObject<HTMLDivElement> = React.createRef();
+  triedToAutoConnect = false;
+  metroDevice?: MetroDevice;
+  isMounted = true;
+
+  state = {
+    status: 'initializing',
+  };
+
   componentDidMount() {
     let devToolsNode = findDevToolsNode();
     if (!devToolsNode) {
       devToolsNode = createDevToolsNode();
       this.initializeDevTools(devToolsNode);
+    } else {
+      this.setStatus(
+        'DevTools have been initialized, waiting for connection...',
+      );
+      if (devToolsNode.innerHTML) {
+        this.setStatus(CONNECTED);
+      } else {
+        this.startPollForConnection();
+      }
     }
 
-    const currentComponentNode = ReactDOM.findDOMNode(this);
-    currentComponentNode && attachDevTools(currentComponentNode, devToolsNode);
+    attachDevTools(this.containerRef?.current!, devToolsNode);
+    this.startPollForConnection();
   }
 
   componentWillUnmount() {
+    this.isMounted = false;
+    if (this.pollHandle) {
+      clearTimeout(this.pollHandle);
+    }
     const devToolsNode = findDevToolsNode();
     devToolsNode && detachDevTools(devToolsNode);
   }
 
-  async initializeDevTools(devToolsNode: HTMLElement) {
-    const port = await getPort({ port: 8098 }); // default port for dev tools
-    RelayDevToolsStandalone.setContentDOMNode(devToolsNode).startServer(port);
-    const device = await this.getDevice();
-    if (device) {
-      const host =
-        device.deviceType === 'physical'
-          ? address.ip()
-          : device instanceof AndroidDevice
-          ? '10.0.2.2' // Host IP for Android emulator host system
-          : 'localhost';
-      this.client.call('config', { port, host });
+  setStatus(status: string) {
+    if (!this.isMounted) {
+      return;
+    }
+    if (status.startsWith('The server is listening on')) {
+      this.setState({ status: status + ' Waiting for connection...' });
+    } else {
+      this.setState({ status });
+    }
+  }
 
-      if (['quest', 'go', 'pacific'].includes(device.title.toLowerCase())) {
-        const device = await this.getDevice();
-        (device as AndroidDevice).reverse([port, port]);
+  startPollForConnection() {
+    this.pollHandle = setTimeout(() => {
+      if (!this.isMounted) {
+        return;
       }
+      if (findDevToolsNode()?.innerHTML) {
+        this.setStatus(CONNECTED);
+      } else {
+        if (!this.triedToAutoConnect) {
+          this.triedToAutoConnect = true;
+          this.setStatus(
+            "The DevTools didn't connect yet. Please Reload it to connect",
+          );
+          if (this.metroDevice && this.metroDevice.ws) {
+            this.setStatus(
+              "Sending 'reload' to the Metro to force the DevTools to connect...",
+            );
+            this.metroDevice?.sendCommand('reload');
+          }
+        }
+        this.startPollForConnection();
+      }
+    }, 3000);
+  }
+
+  async initializeDevTools(devToolsNode: HTMLElement) {
+    try {
+      this.setStatus('Waiting for port 8098');
+      const port = await getPort({ port: 8098 }); // default port for dev tools
+      this.setStatus('Starting DevTools server on ' + port);
+      RelayDevToolsStandalone.setContentDOMNode(devToolsNode)
+        .setStatusListener(status => {
+          this.setStatus(status);
+        })
+        .startServer(port);
+      this.setStatus('Waiting for device');
+      const device = this.device;
+
+      if (device) {
+        if (
+          device.deviceType === 'physical' ||
+          SUPPORTED_OCULUS_DEVICE_TYPES.includes(device.title.toLowerCase())
+        ) {
+          this.setStatus(`Setting up reverse port mapping: ${port}:${port}`);
+          (device as AndroidDevice).reverse([port, port]);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      this.setStatus('Failed to initialize DevTools: ' + e);
     }
   }
 
   render() {
-    return <Container />;
+    return (
+      <View grow>
+        {this.state.status !== CONNECTED ? (
+          <Toolbar>{this.state.status}</Toolbar>
+        ) : null}
+        <Container ref={this.containerRef} />
+        <GrabMetroDevice
+          onHasDevice={(device: MetroDevice) => {
+            this.metroDevice = device;
+          }}
+        />
+      </View>
+    );
   }
 }

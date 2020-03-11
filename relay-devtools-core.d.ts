@@ -1,6 +1,7 @@
 declare module 'relay-devtools-core/standalone' {
   interface DevTools {
     setContentDOMNode(node: HTMLElement): DevTools;
+    setStatusListener(listener: (message: string) => void): this;
     startServer(port: number): DevTools;
   }
   const DevTools: DevTools;
