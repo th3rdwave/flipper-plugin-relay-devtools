@@ -27,7 +27,7 @@
     "address": "^1.1.2",
     "flipper": "^0.34.0",
     "get-port": "^5.1.1",
-    "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.0.1-gitpkg"
+    "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.0.2-gitpkg"
   },
   "peerDependencies": {
     "react": "*",
