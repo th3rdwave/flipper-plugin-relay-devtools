@@ -1,6 +1,6 @@
 {
   "name": "flipper-plugin-relay-devtools",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Flipper plugin for Relay devtools",
   "main": "index.tsx",
   "keywords": [
@@ -25,9 +25,9 @@
   },
   "dependencies": {
     "address": "^1.1.2",
-    "flipper": "^0.33.1",
+    "flipper": "^0.34.0",
     "get-port": "^5.1.1",
-    "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.0.0-gitpkg"
+    "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.0.1-gitpkg"
   },
   "peerDependencies": {
     "react": "*",
