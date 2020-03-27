@@ -1,6 +1,6 @@
 {
   "name": "flipper-plugin-relay-devtools",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Flipper plugin for Relay devtools",
   "main": "index.tsx",
   "keywords": [
