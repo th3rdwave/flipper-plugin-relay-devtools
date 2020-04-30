@@ -1,8 +1,11 @@
 {
+  "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
   "name": "flipper-plugin-relay-devtools",
+  "id": "flipper-plugin-relay-devtools",
   "version": "0.3.2",
   "description": "Flipper plugin for Relay devtools",
-  "main": "index.tsx",
+  "main": "dist/bundle.js",
+  "flipperBundlerEntry": "index.tsx",
   "keywords": [
     "flipper-plugin",
     "relay",
@@ -21,24 +24,27 @@
   },
   "homepage": "https://github.com/th3rdwave/flipper-plugin-relay-devtools#readme",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepack": "flipper-pkg lint && flipper-pkg bundle"
   },
   "dependencies": {
     "address": "^1.1.2",
-    "flipper": "^0.34.0",
     "get-port": "^5.1.1",
     "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.0.2-gitpkg"
   },
   "peerDependencies": {
+    "flipper": "*",
     "react": "*",
     "react-dom": "*",
     "react-native": "*",
-    "react-native-flipper": "*"
+    "react-native-flipper": "*"    
   },
   "devDependencies": {
     "@types/react": "^16.9.19",
     "@types/react-dom": "^16.9.5",
     "@types/react-native": "^0.61.12",
+    "flipper": "latest",
+    "flipper-pkg": "latest",
     "prettier": "^1.19.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
