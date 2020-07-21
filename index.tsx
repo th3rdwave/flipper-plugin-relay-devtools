@@ -65,9 +65,9 @@ const GrabMetroDevice = connect<
   ReduxState
 >(({ connections: { devices } }: ReduxState) => ({
   metroDevice: devices.find(
-    device => device.os === 'Metro' && !device.isArchived,
+    (device) => device.os === 'Metro' && !device.isArchived,
   ) as MetroDevice,
-}))(function({
+}))(function ({
   metroDevice,
   onHasDevice,
 }: GrabMetroDeviceStoreProps & GrabMetroDeviceOwnProps) {
@@ -171,7 +171,7 @@ export default class ReactDevTools extends FlipperDevicePlugin<
       const port = await getPort({ port: 8098 }); // default port for dev tools
       this.setStatus('Starting DevTools server on ' + port);
       RelayDevToolsStandalone.setContentDOMNode(devToolsNode)
-        .setStatusListener(status => {
+        .setStatusListener((status) => {
           this.setStatus(status);
         })
         .startServer(port);
