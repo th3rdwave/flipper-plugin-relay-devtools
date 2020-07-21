@@ -2,7 +2,7 @@
   "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
   "name": "flipper-plugin-relay-devtools",
   "id": "flipper-plugin-relay-devtools",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Flipper plugin for Relay devtools",
   "main": "dist/bundle.js",
   "flipperBundlerEntry": "index.tsx",
@@ -37,7 +37,7 @@
     "react": "*",
     "react-dom": "*",
     "react-native": "*",
-    "react-native-flipper": "*"    
+    "react-native-flipper": "*"
   },
   "devDependencies": {
     "@types/react": "^16.9.43",
