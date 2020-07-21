@@ -6670,9 +6670,9 @@ regjsparser@^0.6.4:
   dependencies:
     jsesc "~0.5.0"
 
-relay-devtools-core@janicduplessis/relay-devtools#relay-devtools-core-v1.0.2-gitpkg:
-  version "1.0.2"
-  resolved "https://codeload.github.com/janicduplessis/relay-devtools/tar.gz/23de46d4bed14dd396c456b45aac6cc0c5496b3d"
+relay-devtools-core@janicduplessis/relay-devtools#relay-devtools-core-v1.1.0-gitpkg:
+  version "1.1.0"
+  resolved "https://codeload.github.com/janicduplessis/relay-devtools/tar.gz/87fef3d87e756d98b5cb92cc0878e40e79c34922"
   dependencies:
     shell-quote "^1.6.1"
     ws "^7"
