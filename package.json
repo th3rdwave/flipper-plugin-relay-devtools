@@ -4,7 +4,7 @@
   "id": "flipper-plugin-relay-devtools",
   "version": "0.5.0",
   "description": "Flipper plugin for Relay devtools",
-  "main": "dist/bundle.js",
+  "main": "client.js",
   "flipperBundlerEntry": "index.tsx",
   "pluginType": "device",
   "supportedDevices": [
@@ -31,7 +31,7 @@
   "homepage": "https://github.com/th3rdwave/flipper-plugin-relay-devtools#readme",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepack": "flipper-pkg lint && flipper-pkg bundle"
+    "prepack": "flipper-pkg lint && flipper-pkg bundle && tsc --project tsconfig.transpile.json"
   },
   "dependencies": {
     "address": "^1.1.2",
