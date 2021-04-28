@@ -9,7 +9,7 @@ Note that this uses the new version of relay devtools that is still under develo
 ## Installation
 
 ```
-npm install flipper-plugin-relay-devtools react-native-flipper
+npm install react-native-flipper-relay-devtools react-native-flipper
 ```
 
 Make sure `react-native-flipper` is installed properly if not using autolinking.
@@ -24,7 +24,7 @@ Register the flipper plugin and connect to relay devtools.
 
 ```js
 if (__DEV__) {
-  import('flipper-plugin-relay-devtools/client').then(m => m.addPlugin());
+  import('react-native-flipper-relay-devtools').then(m => m.addPlugin());
 }
 ```
 
