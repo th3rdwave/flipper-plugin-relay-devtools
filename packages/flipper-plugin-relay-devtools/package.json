@@ -1,5 +1,4 @@
 {
-  "private": true,
   "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
   "name": "flipper-plugin-relay-devtools",
   "id": "flipper-plugin-relay-devtools",
