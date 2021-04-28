@@ -192,7 +192,7 @@ export default class ReactDevTools extends FlipperDevicePlugin<
   async initializeDevTools(devToolsNode: HTMLElement) {
     try {
       this.setStatus(ConnectionStatus.Initializing, 'Waiting for port 8097');
-      const port = await getPort({ port: 8097 });
+      const port = await getPort({ port: 8098 });
       this.setStatus(
         ConnectionStatus.Initializing,
         'Starting DevTools server on ' + port,
