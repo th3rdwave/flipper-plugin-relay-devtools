@@ -1,60 +1,34 @@
 {
-  "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
-  "name": "flipper-plugin-relay-devtools",
-  "id": "flipper-plugin-relay-devtools",
-  "version": "0.5.0",
-  "description": "Flipper plugin for Relay devtools",
-  "main": "client.js",
-  "flipperBundlerEntry": "src/index.tsx",
-  "pluginType": "device",
-  "supportedDevices": [
-    {
-      "os": "Metro"
-    }
-  ],
-  "keywords": [
-    "flipper-plugin",
-    "relay",
-    "devtools"
-  ],
-  "icon": "network",
-  "title": "Relay Devtools",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/th3rdwave/flipper-plugin-relay-devtools.git"
-  },
+  "private": true,
   "author": "Janic Duplessis",
   "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/th3rdwave/flipper-plugin-relay-devtools/issues"
-  },
-  "homepage": "https://github.com/th3rdwave/flipper-plugin-relay-devtools#readme",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prepack": "flipper-pkg lint && flipper-pkg bundle && tsc --project tsconfig.transpile.json"
+    "lint:ts": "tsc --noEmit",
+    "lint:prettier": "prettier 'src/**/*.{ts,tsx}' --check",
+    "lint": "flipper-pkg lint && yarn lint:prettier",
+    "build": "flipper-pkg bundle"
   },
-  "dependencies": {
-    "address": "^1.1.2",
-    "get-port": "^5.1.1",
-    "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.2.0-gitpkg"
-  },
-  "peerDependencies": {
-    "flipper": "*",
-    "flipper-plugin": "*",
-    "react-native-flipper": "*"
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ],
+    "nohoist": [
+      "**/flipper",
+      "**/flipper/**",
+      "**/flipper-pkg",
+      "**/flipper-pkg/**"
+    ]
   },
   "devDependencies": {
     "@types/react": "^17.0.4",
-    "@types/react-dom": "^17.0.3",
     "@types/react-native": "^0.64.4",
-    "flipper": "latest",
-    "flipper-pkg": "latest",
-    "flipper-plugin": "latest",
-    "prettier": "^2.2.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2",
     "react-native": "^0.64.0",
     "react-native-flipper": "^0.86.0",
+    "lerna": "^4.0.0",
+    "prettier": "^2.2.1",
     "typescript": "^4.2.4"
-  }
+  },
+  "name": "flipper-plugin-relay-devtools"
 }

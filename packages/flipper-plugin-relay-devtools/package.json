@@ -1,0 +1,59 @@
+{
+  "private": true,
+  "$schema": "https://fbflipper.com/schemas/plugin-package/v2.json",
+  "name": "flipper-plugin-relay-devtools",
+  "id": "flipper-plugin-relay-devtools",
+  "version": "0.5.0",
+  "description": "Flipper plugin for Relay devtools",
+  "main": "client.js",
+  "flipperBundlerEntry": "src/index.tsx",
+  "pluginType": "device",
+  "supportedDevices": [
+    {
+      "os": "Metro",
+      "archived": false
+    }
+  ],
+  "keywords": [
+    "flipper-plugin",
+    "relay",
+    "devtools"
+  ],
+  "files": [
+    "src",
+    "client.js",
+    "client.map"
+  ],
+  "icon": "network",
+  "title": "Relay Devtools",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/th3rdwave/flipper-plugin-relay-devtools.git",
+    "directory": "packages/flipper-plugin-relay-devtools"
+  },
+  "author": "Janic Duplessis",
+  "license": "MIT",
+  "homepage": "https://github.com/th3rdwave/flipper-plugin-relay-devtools#readme",
+  "scripts": {
+    "lint": "flipper-pkg lint",
+    "build": "flipper-pkg bundle",
+    "watch": "flipper-pkg bundle --watch",
+    "prepack": "flipper-pkg lint && flipper-pkg bundle --production"
+  },
+  "dependencies": {
+    "address": "^1.1.2",
+    "get-port": "^5.1.1",
+    "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.2.0-gitpkg"
+  },
+  "peerDependencies": {
+    "flipper": "*"
+  },
+  "devDependencies": {
+    "@types/react": "^17.0.4",
+    "@types/react-dom": "^17.0.3",
+    "flipper": "latest",
+    "flipper-pkg": "latest",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  }
+}

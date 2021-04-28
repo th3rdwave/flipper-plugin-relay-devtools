@@ -16,5 +16,6 @@
     "noImplicitReturns": true,
     "isolatedModules": true
   },
-  "include": ["./src/**/*"]
+  "include": ["./packages/*/src/**/*", "./typings/**/*"],
+  "exclude": ["**/dist/", "**/node_modules/"]
 }
