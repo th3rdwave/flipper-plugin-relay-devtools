@@ -16,5 +16,5 @@
     "noImplicitReturns": true,
     "isolatedModules": true
   },
-  "exclude": [ "node_modules", "dist" ]
+  "include": ["./src/**/*"]
 }

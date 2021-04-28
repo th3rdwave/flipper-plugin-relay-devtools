@@ -3,5 +3,5 @@
   "compilerOptions": {
     "noEmit": false
   },
-  "include": [ "relay-devtools-core.d.ts", "client.tsx" ]
+  "include": [ "src/relay-devtools-core.d.ts", "src/client.tsx" ]
 }

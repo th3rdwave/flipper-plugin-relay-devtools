@@ -5,7 +5,7 @@
   "version": "0.5.0",
   "description": "Flipper plugin for Relay devtools",
   "main": "client.js",
-  "flipperBundlerEntry": "index.tsx",
+  "flipperBundlerEntry": "src/index.tsx",
   "pluginType": "device",
   "supportedDevices": [
     {
@@ -36,26 +36,25 @@
   "dependencies": {
     "address": "^1.1.2",
     "get-port": "^5.1.1",
-    "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.1.0-gitpkg"
+    "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.2.0-gitpkg"
   },
   "peerDependencies": {
     "flipper": "*",
-    "react": "*",
-    "react-dom": "*",
-    "react-native": "*",
+    "flipper-plugin": "*",
     "react-native-flipper": "*"
   },
   "devDependencies": {
-    "@types/react": "^16.9.43",
-    "@types/react-dom": "^16.9.8",
-    "@types/react-native": "^0.63.1",
+    "@types/react": "^17.0.4",
+    "@types/react-dom": "^17.0.3",
+    "@types/react-native": "^0.64.4",
     "flipper": "latest",
     "flipper-pkg": "latest",
-    "prettier": "^2.0.5",
+    "flipper-plugin": "latest",
+    "prettier": "^2.2.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-native": "^0.64.0",
-    "react-native-flipper": "0.86.0",
-    "typescript": "^3.9.7"
+    "react-native-flipper": "^0.86.0",
+    "typescript": "^4.2.4"
   }
 }
