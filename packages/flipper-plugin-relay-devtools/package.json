@@ -37,7 +37,7 @@
     "lint": "flipper-pkg lint",
     "build": "flipper-pkg bundle",
     "watch": "flipper-pkg bundle --watch",
-    "prepack": "flipper-pkg lint && flipper-pkg bundle --production"
+    "prepack": "flipper-pkg lint && flipper-pkg bundle"
   },
   "dependencies": {
     "address": "^1.1.2",
