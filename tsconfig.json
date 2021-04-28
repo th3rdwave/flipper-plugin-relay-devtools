@@ -15,5 +15,6 @@
     "noImplicitThis": true,
     "noImplicitReturns": true,
     "isolatedModules": true
-  }
+  },
+  "exclude": [ "node_modules", "dist" ]
 }
