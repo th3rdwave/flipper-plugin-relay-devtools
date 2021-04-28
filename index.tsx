@@ -86,10 +86,6 @@ export default class ReactDevTools extends FlipperDevicePlugin<
   any,
   {}
 > {
-  static supportsDevice(device: Device) {
-    return !device.isArchived && device.os === 'Metro';
-  }
-
   pollHandle?: any;
   containerRef: React.RefObject<HTMLDivElement> = React.createRef();
   triedToAutoConnect = false;

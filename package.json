@@ -6,6 +6,12 @@
   "description": "Flipper plugin for Relay devtools",
   "main": "dist/bundle.js",
   "flipperBundlerEntry": "index.tsx",
+  "pluginType": "device",
+  "supportedDevices": [
+    {
+      "os": "Metro"
+    }
+  ],
   "keywords": [
     "flipper-plugin",
     "relay",
