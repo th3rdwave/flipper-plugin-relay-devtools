@@ -90,7 +90,7 @@ enum ConnectionStatus {
   Error = 'Error',
 }
 
-export default class ReactDevTools extends FlipperDevicePlugin<
+export default class RelayDevTools extends FlipperDevicePlugin<
   { status: string },
   any,
   {}
@@ -181,7 +181,7 @@ export default class ReactDevTools extends FlipperDevicePlugin<
         case this.connectionStatus === ConnectionStatus.WaitingForReload:
           this.setStatus(
             ConnectionStatus.WaitingForReload,
-            "The DevTools didn't connect yet. Please verify your React Native app is in development mode, and that no other instance of the React DevTools are attached to the app already.",
+            "The DevTools didn't connect yet. Please verify your React Native app is in development mode, and that no other instance of the Relay DevTools are attached to the app already.",
           );
           this.startPollForConnection();
           return;
@@ -191,7 +191,7 @@ export default class ReactDevTools extends FlipperDevicePlugin<
 
   async initializeDevTools(devToolsNode: HTMLElement) {
     try {
-      this.setStatus(ConnectionStatus.Initializing, 'Waiting for port 8097');
+      this.setStatus(ConnectionStatus.Initializing, 'Waiting for port 8098');
       const port = await getPort({ port: 8098 });
       this.setStatus(
         ConnectionStatus.Initializing,
