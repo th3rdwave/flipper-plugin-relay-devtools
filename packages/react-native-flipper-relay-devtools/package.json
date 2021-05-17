@@ -1,8 +1,9 @@
 {
   "name": "react-native-flipper-relay-devtools",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Flipper React Native plugin for Relay devtools",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "src",
     "dist"
