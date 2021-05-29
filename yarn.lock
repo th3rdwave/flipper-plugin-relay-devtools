@@ -9651,6 +9651,13 @@ relay-devtools-core@janicduplessis/relay-devtools#relay-devtools-core-v1.2.0-git
     shell-quote "^1.6.1"
     ws "^7"
 
+relay-devtools-core@janicduplessis/relay-devtools#relay-devtools-core-v1.2.1-gitpkg:
+  version "1.2.1"
+  resolved "https://codeload.github.com/janicduplessis/relay-devtools/tar.gz/3175e77be3027d0a4ca8ae1d9f5a1ab278afa8dc"
+  dependencies:
+    shell-quote "^1.6.1"
+    ws "^7"
+
 remark-parse@^9.0.0:
   version "9.0.0"
   resolved "https://registry.yarnpkg.com/remark-parse/-/remark-parse-9.0.0.tgz#4d20a299665880e4f4af5d90b7c7b8a935853640"

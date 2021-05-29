@@ -27,7 +27,7 @@
     "prepack": "yarn build"
   },
   "dependencies": {
-    "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.2.0-gitpkg"
+    "relay-devtools-core": "janicduplessis/relay-devtools#relay-devtools-core-v1.2.1-gitpkg"
   },
   "peerDependencies": {
     "react-native-flipper": "*"
