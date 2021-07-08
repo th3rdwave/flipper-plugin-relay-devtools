@@ -21,14 +21,14 @@
     ]
   },
   "devDependencies": {
-    "@types/react": "^17.0.4",
-    "@types/react-native": "^0.64.4",
+    "@types/react": "^17.0.14",
+    "@types/react-native": "^0.64.11",
     "react": "^17.0.2",
-    "react-native": "^0.64.0",
-    "react-native-flipper": "^0.86.0",
+    "react-native": "^0.64.2",
+    "react-native-flipper": "^0.96.1",
     "lerna": "^4.0.0",
-    "prettier": "^2.2.1",
-    "typescript": "^4.2.4"
+    "prettier": "^2.3.2",
+    "typescript": "^4.3.5"
   },
   "name": "flipper-plugin-relay-devtools"
 }

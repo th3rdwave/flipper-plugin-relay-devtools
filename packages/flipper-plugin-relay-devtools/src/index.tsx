@@ -1,87 +1,27 @@
-// Based on https://github.com/facebook/flipper/blob/master/desktop/plugins/public/reactdevtools/index.tsx
+// Based on https://github.com/facebook/flipper/blob/master/desktop/plugins/public/relaydevtools/index.tsx
 
-import RelayDevToolsStandalone from 'relay-devtools-core/standalone';
+import RelayDevToolsStandaloneEmbedded from 'relay-devtools-core/standalone';
 import {
-  FlipperDevicePlugin,
-  AndroidDevice,
-  styled,
-  View,
-  MetroDevice,
-  ReduxState,
-  connect,
-  Device,
-  CenteredView,
-  RoundedSection,
-  Text,
-  Button,
-} from 'flipper';
-import React, { useEffect } from 'react';
+  Layout,
+  usePlugin,
+  DevicePluginClient,
+  createState,
+  useValue,
+  Toolbar,
+} from 'flipper-plugin';
+import React from 'react';
 import getPort from 'get-port';
+import { Button, Typography } from 'antd';
+import { DevToolsEmbedder } from './DevToolsEmbedder';
 
-const Container = styled.div({
-  display: 'flex',
-  flex: '1 1 0%',
-  justifyContent: 'center',
-  alignItems: 'stretch',
-  height: '100%',
-});
-
-const DEV_TOOLS_NODE_ID = 'relaydevtools-out-of-react-node';
-
-function createDevToolsNode(): HTMLElement {
-  const div = document.createElement('div');
-  div.id = DEV_TOOLS_NODE_ID;
-  div.style.display = 'none';
-  div.style.width = '100%';
-  div.style.height = '100%';
-  div.style.flex = '1 1 0%';
-  div.style.justifyContent = 'center';
-  div.style.alignItems = 'stretch';
-
-  document.body && document.body.appendChild(div);
-
-  return div;
-}
-
-function findDevToolsNode(): HTMLElement | null {
-  return document.querySelector('#' + DEV_TOOLS_NODE_ID);
-}
-
-function attachDevTools(target: Element | Text, devToolsNode: HTMLElement) {
-  target.appendChild(devToolsNode);
-  devToolsNode.style.display = 'flex';
-}
-
-function detachDevTools(devToolsNode: HTMLElement) {
-  devToolsNode.style.display = 'none';
-  document.body && document.body.appendChild(devToolsNode);
-}
-
+const DEV_TOOLS_NODE_ID = 'relaydevtools-out-of-relay-node';
 const CONNECTED = 'DevTools connected';
+const DEV_TOOLS_PORT = 8098; // hardcoded in RN
 
-type GrabMetroDeviceStoreProps = { metroDevice: MetroDevice };
-type GrabMetroDeviceOwnProps = { onHasDevice(device: MetroDevice): void };
-
-const GrabMetroDevice = connect<
-  GrabMetroDeviceStoreProps,
-  {},
-  GrabMetroDeviceOwnProps,
-  ReduxState
->(({ connections: { devices } }) => ({
-  metroDevice: devices.find(
-    (device: Device) => device.os === 'Metro' && !device.isArchived,
-  ) as MetroDevice,
-}))(function ({
-  metroDevice,
-  onHasDevice,
-}: GrabMetroDeviceStoreProps & GrabMetroDeviceOwnProps) {
-  useEffect(() => {
-    onHasDevice(metroDevice);
-  }, [metroDevice, onHasDevice]);
-  return null;
-});
-
-const SUPPORTED_OCULUS_DEVICE_TYPES = ['quest', 'go', 'pacific'];
+interface MetroDevice {
+  ws?: WebSocket;
+  sendCommand(command: string, params?: any): void;
+}
 
 enum ConnectionStatus {
   Initializing = 'Initializing...',
@@ -90,176 +30,182 @@ enum ConnectionStatus {
   Error = 'Error',
 }
 
-export default class RelayDevTools extends FlipperDevicePlugin<
-  { status: string },
-  any,
-  {}
-> {
-  pollHandle?: any;
-  containerRef: React.RefObject<HTMLDivElement> = React.createRef();
-  connectionStatus: ConnectionStatus = ConnectionStatus.Initializing;
-  metroDevice?: MetroDevice;
-  isMounted = true;
-
-  state = {
-    status: 'initializing',
-  };
-
-  componentDidMount() {
-    this.bootDevTools();
+export function devicePlugin(client: DevicePluginClient) {
+  const metroDevice: MetroDevice = client.device.realDevice;
+  if (!metroDevice.sendCommand || !('ws' in metroDevice)) {
+    throw new Error('Invalid metroDevice');
   }
 
-  componentWillUnmount() {
-    this.isMounted = false;
-    if (this.pollHandle) {
-      clearTimeout(this.pollHandle);
-    }
-    const devToolsNode = findDevToolsNode();
-    devToolsNode && detachDevTools(devToolsNode);
-  }
+  const statusMessage = createState('initializing');
+  const connectionStatus = createState<ConnectionStatus>(
+    ConnectionStatus.Initializing,
+  );
+  let devToolsInstance: typeof RelayDevToolsStandaloneEmbedded = RelayDevToolsStandaloneEmbedded;
 
-  setStatus(connectionStatus: ConnectionStatus, status: string) {
-    this.connectionStatus = connectionStatus;
-    if (!this.isMounted) {
+  let startResult: { close(): void } | undefined = undefined;
+
+  let pollHandle: any | undefined = undefined;
+
+  async function bootDevTools() {
+    const devToolsNode = document.getElementById(DEV_TOOLS_NODE_ID);
+    if (!devToolsNode) {
+      setStatus(ConnectionStatus.Error, 'Failed to find target DOM Node');
       return;
     }
-    if (status.startsWith('The server is listening on')) {
-      this.setState({ status: status + ' Waiting for connection...' });
-    } else {
-      this.setState({ status });
-    }
-  }
 
-  devtoolsHaveStarted() {
-    return !!findDevToolsNode()?.innerHTML;
-  }
-
-  bootDevTools() {
-    let devToolsNode = findDevToolsNode();
-    if (!devToolsNode) {
-      devToolsNode = createDevToolsNode();
-      this.initializeDevTools(devToolsNode);
+    // Relay DevTools were initilized before
+    if (startResult) {
+      if (devtoolsHaveStarted()) {
+        setStatus(ConnectionStatus.Connected, CONNECTED);
+      } else {
+        startPollForConnection();
+      }
+      return;
     }
-    this.setStatus(
+
+    // They're new!
+    try {
+      setStatus(
+        ConnectionStatus.Initializing,
+        'Waiting for port ' + DEV_TOOLS_PORT,
+      );
+      const port = await getPort({ port: DEV_TOOLS_PORT }); // default port for dev tools
+      if (port !== DEV_TOOLS_PORT) {
+        setStatus(
+          ConnectionStatus.Error,
+          `Port ${DEV_TOOLS_PORT} is already taken`,
+        );
+        return;
+      }
+      setStatus(
+        ConnectionStatus.Initializing,
+        'Starting DevTools server on ' + port,
+      );
+      startResult = devToolsInstance
+        .setContentDOMNode(devToolsNode)
+        .setStatusListener((status) => {
+          // TODO: since devToolsInstance is an instance, we are probably leaking memory here
+          setStatus(ConnectionStatus.Initializing, status);
+        })
+        .startServer(port) as any;
+      setStatus(ConnectionStatus.Initializing, 'Waiting for device');
+    } catch (e) {
+      console.error('Failed to initalize Relay DevTools' + e);
+      setStatus(ConnectionStatus.Error, 'Failed to initialize DevTools: ' + e);
+    }
+
+    setStatus(
       ConnectionStatus.Initializing,
       'DevTools have been initialized, waiting for connection...',
     );
-    if (this.devtoolsHaveStarted()) {
-      this.setStatus(ConnectionStatus.Connected, CONNECTED);
+    if (devtoolsHaveStarted()) {
+      setStatus(ConnectionStatus.Connected, CONNECTED);
     } else {
-      this.startPollForConnection();
+      startPollForConnection();
     }
-
-    attachDevTools(this.containerRef?.current!, devToolsNode);
-    this.startPollForConnection();
   }
 
-  startPollForConnection(delay = 3000) {
-    this.pollHandle = setTimeout(() => {
+  function setStatus(cs: ConnectionStatus, status: string) {
+    connectionStatus.set(cs);
+    if (status.startsWith('The server is listening on')) {
+      statusMessage.set(status + ' Waiting for connection...');
+    } else {
+      statusMessage.set(status);
+    }
+  }
+
+  function startPollForConnection(delay = 3000) {
+    pollHandle = setTimeout(async () => {
       switch (true) {
-        case !this.isMounted:
+        // Found DevTools!
+        case devtoolsHaveStarted():
+          setStatus(ConnectionStatus.Connected, CONNECTED);
           return;
-        case this.devtoolsHaveStarted():
-          this.setStatus(ConnectionStatus.Connected, CONNECTED);
-          return;
-        case this.connectionStatus === ConnectionStatus.Initializing &&
-          !!this.metroDevice?.ws:
-          this.setStatus(
+        // Waiting for connection, but we do have an active Metro connection, lets force a reload to enter Dev Mode on app
+        // prettier-ignore
+        case connectionStatus.get() === ConnectionStatus.Initializing && !!metroDevice?.ws:
+           setStatus(
+             ConnectionStatus.WaitingForReload,
+             "Sending 'reload' to Metro to force the DevTools to connect...",
+           );
+           metroDevice!.sendCommand('reload');
+           startPollForConnection(2000);
+           return;
+        // Waiting for initial connection, but no WS bridge available
+        case connectionStatus.get() === ConnectionStatus.Initializing:
+          setStatus(
             ConnectionStatus.WaitingForReload,
-            "Sending 'reload' to Metro to force the DevTools to connect...",
+            "The DevTools didn't connect yet. Please trigger the DevMenu in the React Native app, or Reload it to connect.",
           );
-          this.metroDevice!.sendCommand('reload');
-          this.startPollForConnection(10000);
+          startPollForConnection(10000);
           return;
-        case this.connectionStatus === ConnectionStatus.Initializing:
-          this.setStatus(
+        // Still nothing? Users might not have done manual action, or some other tools have picked it up?
+        case connectionStatus.get() === ConnectionStatus.WaitingForReload:
+          setStatus(
             ConnectionStatus.WaitingForReload,
-            "The DevTools didn't connect yet. Please trigger the DevMenu in the React Native app, or Reload it to connect",
+            "The DevTools didn't connect yet. Check if no other instances are running.",
           );
-          this.startPollForConnection(10000);
-          return;
-        case this.connectionStatus === ConnectionStatus.WaitingForReload:
-          this.setStatus(
-            ConnectionStatus.WaitingForReload,
-            "The DevTools didn't connect yet. Please verify your React Native app is in development mode, and that no other instance of the Relay DevTools are attached to the app already.",
-          );
-          this.startPollForConnection();
+          startPollForConnection();
           return;
       }
     }, delay);
   }
 
-  async initializeDevTools(devToolsNode: HTMLElement) {
-    try {
-      this.setStatus(ConnectionStatus.Initializing, 'Waiting for port 8098');
-      const port = await getPort({ port: 8098 });
-      this.setStatus(
-        ConnectionStatus.Initializing,
-        'Starting DevTools server on ' + port,
-      );
-      RelayDevToolsStandalone.setContentDOMNode(devToolsNode)
-        .setStatusListener((status) => {
-          this.setStatus(ConnectionStatus.Initializing, status);
-        })
-        .startServer(port);
-      this.setStatus(ConnectionStatus.Initializing, 'Waiting for device');
-      const device = this.device;
+  function devtoolsHaveStarted() {
+    return (
+      (document.getElementById(DEV_TOOLS_NODE_ID)?.childElementCount ?? 0) > 0
+    );
+  }
 
-      if (device) {
-        if (
-          device.deviceType === 'physical' ||
-          SUPPORTED_OCULUS_DEVICE_TYPES.includes(device.title.toLowerCase())
-        ) {
-          this.setStatus(
-            ConnectionStatus.Initializing,
-            `Setting up reverse port mapping: ${port}:${port}`,
-          );
-          (device as AndroidDevice).reverse([port, port]);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-      this.setStatus(
-        ConnectionStatus.Error,
-        'Failed to initialize DevTools: ' + e,
-      );
+  client.onDestroy(() => {
+    startResult?.close();
+  });
+
+  client.onActivate(() => {
+    bootDevTools();
+  });
+
+  client.onDeactivate(() => {
+    if (pollHandle) {
+      clearTimeout(pollHandle);
     }
-  }
+  });
 
-  render() {
-    return (
-      <View grow>
-        {!this.devtoolsHaveStarted() ? this.renderStatus() : null}
-        <Container ref={this.containerRef} />
-        <GrabMetroDevice
-          onHasDevice={(device) => {
-            this.metroDevice = device;
-          }}
-        />
-      </View>
-    );
-  }
+  return {
+    devtoolsHaveStarted,
+    connectionStatus,
+    statusMessage,
+    bootDevTools,
+    metroDevice,
+  };
+}
 
-  renderStatus() {
-    return (
-      <CenteredView>
-        <RoundedSection title={this.connectionStatus}>
-          <Text>{this.state.status}</Text>
-          {(this.connectionStatus === ConnectionStatus.WaitingForReload &&
-            this.metroDevice?.ws) ||
-          this.connectionStatus === ConnectionStatus.Error ? (
-            <Button
-              style={{ width: 200, margin: '10px auto 0 auto' }}
-              onClick={() => {
-                this.metroDevice?.sendCommand('reload');
-                this.bootDevTools();
-              }}
-            >
-              Retry
-            </Button>
-          ) : null}
-        </RoundedSection>
-      </CenteredView>
-    );
-  }
+export function Component() {
+  const instance = usePlugin(devicePlugin);
+  const connectionStatus = useValue(instance.connectionStatus);
+  const statusMessage = useValue(instance.statusMessage);
+
+  return (
+    <Layout.Container grow>
+      <Toolbar wash>
+        {connectionStatus !== ConnectionStatus.Connected ? (
+          <Typography.Text type="secondary">{statusMessage}</Typography.Text>
+        ) : null}
+        {(connectionStatus === ConnectionStatus.WaitingForReload &&
+          instance.metroDevice?.ws) ||
+        connectionStatus === ConnectionStatus.Error ? (
+          <Button
+            size="small"
+            onClick={() => {
+              instance.metroDevice?.sendCommand('reload');
+              instance.bootDevTools();
+            }}
+          >
+            Retry
+          </Button>
+        ) : null}
+      </Toolbar>
+      <DevToolsEmbedder offset={40} nodeId={DEV_TOOLS_NODE_ID} />
+    </Layout.Container>
+  );
 }

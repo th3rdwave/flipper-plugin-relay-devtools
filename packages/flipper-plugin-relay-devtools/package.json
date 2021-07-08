@@ -48,8 +48,8 @@
     "flipper": "*"
   },
   "devDependencies": {
-    "@types/react": "^17.0.4",
-    "@types/react-dom": "^17.0.3",
+    "@types/react": "^17.0.14",
+    "@types/react-dom": "^17.0.9",
     "flipper": "latest",
     "flipper-pkg": "latest",
     "react": "^17.0.2",
