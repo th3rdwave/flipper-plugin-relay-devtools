@@ -48,7 +48,7 @@
     "flipper-plugin": "*"
   },
   "devDependencies": {
-    "@types/react": "^17.0.14",
+    "@types/react": "^17.0.30",
     "@types/react-dom": "^17.0.9",
     "flipper": "latest",
     "flipper-pkg": "latest",
