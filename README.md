@@ -24,7 +24,7 @@ Register the flipper plugin and connect to relay devtools.
 
 ```js
 if (__DEV__) {
-  import('react-native-flipper-relay-devtools').then(m => m.addPlugin());
+  require('react-native-flipper-relay-devtools').addPlugin();
 }
 ```
 
